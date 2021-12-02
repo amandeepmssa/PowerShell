@@ -1,0 +1,120 @@
+get-help *resolve*
+get-command *resolve*
+get-command -verb resolve
+get-help *adapter*
+get-command *adapter*
+get-command -noun *adapter*
+get-command -verb set -noun *adapter*
+get-help set-netadapter
+Set-NetAdapter
+get-help *sched*
+get-command *sched*
+get-module *sched* -ListAvailable
+get-help *block*
+get-help *branch*
+get-help *cache*
+get-command *cache*
+get-command -verb clear
+get-help *firewall*
+get-command *firewall*
+get-help *rule*
+get-command *rule*
+get-help get-netfirewallrule -ShowWindow
+get-help *address*
+get-command -verb suspend
+get-command -noun *content*
+get-alias -definition get-content
+get-command *firewall*
+get-help get-netfirewallrule -ShowWindow
+get-netfirewallrule -enabled true
+
+1..10 | Foreach-object {write-Host $_}
+
+get-childitem -path e:\ -recurse -directory | foreach-object {$_.getfiles()}
+
+1..10 | foreach-object {get-random -setseed $_}
+get-command *address*
+Get-NetIPAddress -AddressFamily IPv4
+get-command *service*
+set-service -Name BITS -StartupType Automatic
+get-command -verb test
+Test-NetConnection -ComputerName LON-DC1 -InformationLevel Quiet
+get-command *eventlog*
+Get-EventLog -LogName Security -Newest 10 | format-list
+get-help about*
+get-help about*env*
+$env:COMPUTERNAME
+get-help about*sign* -ShowWindow
+get-service | Get-Member
+get-service | select-object -Property *
+get-service -name bits | get-member
+$serviceinfo = get-service -name bits
+$serviceinfo.start()
+Get-EventLog -logname system -newest 5 | format-table -wrap
+get-verb | format-wide -property verb -autosize
+Get-EventLog -logname system -newest 5 | select-object -property message | format-table 2
+get-service | Sort-Object -Property status
+get-service | gm
+$service = Get-Service
+$service.status.value__
+get-service | sort status,name | format-table -groupby status
+cd C:\Windows
+get-childitem -file | measure-object -Property length -average -maximum -Minimum -sum
+get-process | sort-object -descending -property VM | select-object -first 10 -property Name,ID,VM
+get-process | sort-object -descending -property VM | select-object -first 10
+Get-Volume -DriveLetter c,e | gm
+Get-Volume -DriveLetter c,e | select-object -property driveletter,size,sizeremaining,@{n='sizeused';e={[math]::Round(($_.size - $_.sizeremaining)/1GB,3)}}
+get-command *date*
+get-date | gm
+get-date | select-object -Property dayofyear
+get-date | select-object -Property *
+get-date | select-object -Property dayofyear | format-list
+get-command *hotfix*
+get-hotfix | select-object HotfixID,installdate,installedby 
+get-hotfix | select-object -property * 
+get-hotfix | select-object HotfixID,installedon,installedby 
+get-hotfix | select-object HotfixID,installedby,
+$Currentdate= get-date 
+get-hotfix | select-object HotfixID,installedby,@{n='Days since installed';e={($Currentdate - $_.installedon).Days}}
+$Currentdate.adddays(-10)
+get-command get*scope*
+get-dhcpserverv4scope -ComputerName Lon-DC1
+get-dhcpserverv4scope -ComputerName Lon-DC1 | select-object scopeid, subnetmask, name | Format-list
+get-netfirewallrule -enabled true | select-object -property profile, displayname | sort-object -property profile,displayname | format-table -groupby profile
+
+get-netneighbor | sort-object -property state
+get-netneighbor | sort-object -Property state | select-object -property IPaddress,state | Format-wide -GroupBy state -autosize
+
+Test-netconnection -computername LON-DC1, lon-svr1 
+
+get-command get*dns*
+Get-DnsClientCache | Select-Object -Property name,type,timetolive
+Get-DnsClientCache | Get-Member
+get-service | where-object {$_.status -eq 'Running'}
+get-service | where-object {$_.status -ne 'Running' and $_.name -like 'a*'}
+get-service | where-object {$_.Name.Length -gt 10}
+get-service | where-object status -eq 'running'
+
+get-command *user*
+get-help get-ADuser -showwindow
+
+get-aduser -filter * -SearchBase "cn=users,dc=adatum,dc=com" | format-table
+$events = get-eventlog -logname Security | where-object {$_.EventID -eq 4624}
+$events.count
+get-eventlog -logname Security | where-object {$_.EventID -eq 4624} | select-object -property Timewritten,eventID,message -last 10 | Format-List
+
+get-childitem -path cert: -recurse | where.object {$_.hasprivatekey -eq $false -and $_.notbefore -lt $now -and $_.NotAfter -gt $Now} | select-object -property friendlyname,notbefore,notafter
+
+get-volume | Where-Object {$_.sizeremaining -gt 0} | select-object -Property * , @{n='PercentFree';e={$_.sizeremaining / $_.size * 100}} | where-object {$_.PercentFree -lt 99} | Select-Object -property driveletter,@{n='size (MB)';e={[Math]::Round($_.size / 1MB)}}
+
+get-service | Sort-Object -property status, name |
+select-object -property displayname,status | out-file -filepath servicelist.txt
+
+get-service -name a* | select-object -property status,starttype,name | convertto-csv | out-file e:\service.csv
+get-service -name a* | select-object -property status,starttype,name | export-csv -path e:\service1.csv
+
+get-service -name a* | select-object -property status,starttype,name | convertto-json | out-file e:\service.csv
+get-service -name a* | select-object -property status,starttype,name | convertto-html | out-file e:\service2.html
+
+ get-aduser -filter * -properties city,department | where-object {$_.city -eq 'london' -and $_.department -eq 'IT'} | sort-object -property Name |  select-object -property name,city,department
+  get-aduser -filter * -properties city,department,office | where-object {$_.city -eq 'london' -and $_.department -eq 'IT'} | sort-object -property Name | select-object -property name,city,department | set-aduser -office "LON-A/1000"
