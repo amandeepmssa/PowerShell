@@ -171,3 +171,53 @@ $WebClientObj | gm
 $WebClientObj | select-object -Property site
 }
 Download -URL 'http://www.mieliestronk.com/corncob_lowercase.txt'
+
+<# Task 1: Create a test group
+On LON-CL1, use PowerShell to create a new Active Directory Domain Services (AD DS) group named IPPhoneTest in the IT organizational unit.
+
+Click for hint
+Click to see the answer
+Add the following users as members in the IPPhoneTest group:
+
+Abbi Skinner
+Ida Alksne
+Parsa Schoonen
+Tonia Guthrie
+Click for hint
+Click to see the answer
+Task 2: Create a script to configure the ipPhone attribute
+Create a script named E:\Mod07\Labfiles\ipPhone.ps1, and then open it in the Windows PowerShell ISE.
+
+Use Get-ADGroupMember to create a query to obtain the membership of the IPPhoneTest group.
+
+Create a ForEach loop that processes the users that are members of IPPhoneTest.
+
+In the loop:
+
+Use Get-ADUser to retrieve the first and last names for a user.
+Calculate the required value for the ipPhone attribute.
+Use Set-ADUser with the -Replace parameter to set the ipPhone attribute for the user.
+Click for hint
+Click to see the answer
+Run the script and then verify that the ipPhone attribute is modified for the selected users.
+
+Click to see the answer #>
+#get-command *group* -Module ActiveDirectory
+
+New-Adgroup -Name IPphoneTest -path 'OU=IT,DC=Adatum,DC=com' -GroupScope Global
+$TestUsers = get-aduser -filter * | where-object {$_.Name -in 'Abbi Skinner',
+'Ida Alksne','Parsa Schoonen','Tonia Guthrie'}
+
+Add-ADGroupMember -Identity IpPhoneTest -Members $TestUsers
+
+Get-ADGroupMember -Identity IpPhoneTest
+
+
+$TestUsers = Get-AdGroupMember -Identity ipphonetest
+
+Foreach ($user in $TestUsers){
+  $Userinfo = Get-AdUser -Identity $user
+  #$Userinfo | select-object -property *
+  $ipphonephoneAttribute = $Userinfo.givenname + '.' + $userinfo.surname + '@adatum.com'
+  set-Aduser -identity $user -replace @{ipphone=$ipphonephoneAttribute}
+}
