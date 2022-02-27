@@ -48,3 +48,47 @@ Test if your function worked by running:
 # If your function worked this will show users within the contractors group
 Get-ADGroupMember -Identity Contractors
 
+##########################CODE####################################
+
+function Add-NewEmployee{
+[cmdletBinding()]
+Param($FilePath='E:\NewHires.csv')
+$CurrentOUnames=(Get-ADOrganizationalUnit -filter *).Name
+#1,4,5,8,5,6,3,6,7,8,9,0 | select-object -unique
+$Fullcsv= Import-csv -Path $FilePath
+$AllDeptsInCSV=$Fullcsv.department | Select-Object -Unique
+#$Fullcsv.department
+#$AllDeptsInCSV
+#$NewDeptInCSV=$AllDeptsInCSV-$CurrentOUnames
+#$NewDeptInCSV | Sort-Object
+$NewDeptsinCSV=Compare-object -ReferenceObject $AllDeptsInCSV -DifferenceObject $CurrentOUnames `
+ | where-object {$_.sideindicator -eq '<='} `
+ | select-object -Property InputObject
+#$NewDeptsinCSV
+Foreach($NewDept in $NewDeptsinCSV)
+{
+New-ADOrganizationalUnit -Name $NewDept.inputobject -Path 'dc=adatum,dc=com'
+New-ADGroup -Groupscope Global -Name $NewDept.inputobject -Path 'ou=$NewDept.inputobject,dc=adatum,dc=com'
+}
+(Get-ADOrganizationalUnit -filter *).Name
+ForEach($EachCSVobject in $Fullcsv)
+{
+$Parameters=@{
+Name=$EachCSVobject.firstname+$EachCSVobject.lastname
+SamAccountName=$Eachcsvobject.firstname.substring(0,1)+$EachCSVobject.lastname
+givename=$eachcsvobject.firstname
+Surname=$eachcsvobject.lastname
+UserPrincipalName=$eachcsvobject.upn
+Department=$eachcsvobject.department
+streetaddress=$eachcsvobject.streetaddress
+city=$eachcsvobject.city
+mobilephone=$eachcsvobject.mobilephone
+office=$eachcsvobject.officename
+path='OU='+$Department+',DC=Adatum,DC=com'
+securestringpassword=$EachCSVobject.password | ConvertTo-SecureString -AsPlainText -Force
+Accountpassword=$securestringpassword
+             }
+}
+
+}
+Add-NewEmployee -Verbose
