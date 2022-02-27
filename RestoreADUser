@@ -1,0 +1,19 @@
+$AllDeletedObjs=Get-ADObject -IncludeDeletedObjects -filter {deleted -eq $True -and objectclass -eq 'user'}
+$ChosenDeletedObjs=Get-ADObject -IncludeDeletedObjects -filter {deleted -eq $True -and objectclass -eq 'user'} | Out-GridView -OutputMode Multiple
+
+#$ChosenDeletedObjs
+Foreach($ChosenDeletedObj in $ChosenDeletedObjs)
+{
+Restore-ADObject -Identity $ChosenDeletedObj.ObjectGUID -confirm:$false
+}
+
+#Get-ADObject -IncludeDeletedObjects -filter {deleted -eq $True -and objectclass -eq 'user'}
+#$RestoredADobj=Get-ADObject -IncludeDeletedObjects -filter {deleted -eq $True -and objectclass -eq 'user'}
+Foreach($ProveRestoreobj in $AllDeletedObjs)
+{
+#if($ProveRestoreobj.deleted -eq $False)
+ #{
+ Write-host 'X'
+ #Get-ADObject -identity $ProveRestoreobj.objectguid
+# }
+}
