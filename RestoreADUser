@@ -17,3 +17,68 @@ Foreach($ProveRestoreobj in $AllDeletedObjs)
  #Get-ADObject -identity $ProveRestoreobj.objectguid
 # }
 }
+
+###################################################
+function Restore-DeletedUsers{
+<#
+        .SYNOPSIS
+        Restore Deleted AD Users
+
+        .DESCRIPTION
+        This command would prompt the user to select from a list of deleted users and restores the selected users. It then lists the restored users.
+
+        .PARAMETER Name
+        Specifies the file name.
+
+        .PARAMETER Extension
+        Specifies the extension. "Txt" is the default.
+
+        .INPUTS
+        None. You cannot pipe objects to Add-Extension.
+
+        .OUTPUTS
+        System.String. Add-Extension returns a string with the extension or file name.
+
+        .EXAMPLE
+        Restore-DeletedUsers
+
+        .EXAMPLE
+        PS> extension -name "File" -extension "doc"
+        File.doc
+
+        .EXAMPLE
+        PS> extension "File" "doc"
+        File.doc
+        .NOTES
+        General notes
+        Created By: Amandeep Rekhi
+        Created On: 28-Feb-2022 
+        
+    #>
+
+
+   [cmdletbinding()]
+   Param()
+   $AllDeletedObjs=Get-ADObject -IncludeDeletedObjects -filter {deleted -eq $True -and objectclass -eq 'user'}
+   $ChosenDeletedObjs=Get-ADObject -IncludeDeletedObjects -filter {deleted -eq $True -and objectclass -eq 'user'} | Out-GridView -OutputMode Multiple
+   
+  
+   Foreach($ChosenDeletedObj in $ChosenDeletedObjs){
+      Restore-ADObject -Identity $ChosenDeletedObj.ObjectGUID -confirm:$false
+   }
+   $ObjectsRestored=Get-ADObject -filter * | Where-Object{$_.ObjectGuid -in $ChosenDeletedObjs.ObjectGuid}
+   $ObjectsRestored | select-object *
+   
+}
+Restore-DeletedUsers
+
+ #$ChosenDeletedObjs
+#Get-ADObject -IncludeDeletedObjects -filter {deleted -eq $True -and objectclass -eq 'user'}
+#$RestoredADobj=Get-ADObject -IncludeDeletedObjects -filter {deleted -eq $True -and objectclass -eq 'user'}
+#Foreach($ProveRestoreobj in $AllDeletedObjs)
+#{
+#if($ProveRestoreobj.deleted -eq $False)
+ #{
+ #Write-host 'X'
+ #Get-ADObject -identity $ProveRestoreobj.objectguid
+# }
